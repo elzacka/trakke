@@ -64,30 +64,31 @@
     }
 
     .sidebar-toggle {
-      position: absolute;
-      top: 50%;
-      right: 1rem;
-      transform: translateY(-50%);
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: white;
-      padding: 0.5rem;
-      border-radius: 6px;
+      background: none;
+      border: none;
+      color: #2c5530;
       cursor: pointer;
-      transition: all 0.3s ease;
+      padding: 0.3rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      margin-left: auto;
     }
 
     .sidebar-toggle:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(44, 85, 48, 0.1);
+      color: #1a3a1c;
     }
 
     .sidebar-toggle .material-symbols-outlined {
-      font-size: 20px;
+      font-size: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-toggle.collapsed .material-symbols-outlined {
+      transform: rotate(180deg);
     }
 
     .container {
@@ -118,6 +119,13 @@
       margin: 0 0 0.5rem 0;
       color: #2c5530;
       font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      justify-content: space-between;
+    }
+
+    .filter-section-header {
       display: flex;
       align-items: center;
       gap: 0.3rem;
@@ -271,9 +279,6 @@
       </h1>
       <p class="tagline">Oppdag Bykle og Valle med turskoa på</p>
     </div>
-    <button class="sidebar-toggle" id="sidebarToggle" title="Vis/skjul meny">
-      <span class="material-symbols-outlined">menu</span>
-    </button>
   </div>
 
   <div class="container">
@@ -281,7 +286,15 @@
     
     <div class="sidebar" id="sidebar">
       <div class="filter-section">
-        <h3><span class="material-symbols-outlined">map</span> Se/ta bort på kart</h3>
+        <h3>
+          <div class="filter-section-header">
+            <span class="material-symbols-outlined">map</span>
+            Vis/skjul på kart
+          </div>
+          <button class="sidebar-toggle" id="sidebarToggle" title="Skjul/vis panel">
+            <span class="material-symbols-outlined">chevron_left</span>
+          </button>
+        </h3>
         <div class="filter-group">
           <div class="filter-item">
             <input type="checkbox" id="hiking" checked />
@@ -372,13 +385,15 @@
         sidebar.classList.remove('hidden');
         mapContainer.classList.remove('sidebar-hidden');
         sidebarOverlay.classList.remove('active');
-        toggleIcon.textContent = 'menu';
-        sidebarToggle.title = 'Skjul meny';
+        sidebarToggle.classList.remove('collapsed');
+        toggleIcon.textContent = 'chevron_left';
+        sidebarToggle.title = 'Skjul panel';
       } else {
         sidebar.classList.add('hidden');
         mapContainer.classList.add('sidebar-hidden');
-        toggleIcon.textContent = 'menu_open';
-        sidebarToggle.title = 'Vis meny';
+        sidebarToggle.classList.add('collapsed');
+        toggleIcon.textContent = 'chevron_right';
+        sidebarToggle.title = 'Vis panel';
       }
 
       // Resize map after animation
