@@ -118,13 +118,13 @@
       transform: translateX(-270px);
     }
 
+    .sidebar-content {
+      transition: opacity 0.3s ease;
+    }
+
     .sidebar.hidden .sidebar-content {
       opacity: 0;
       pointer-events: none;
-    }
-
-    .sidebar-content {
-      transition: opacity 0.3s ease;
     }
 
     .filter-section {
@@ -194,7 +194,7 @@
     }
 
     .map-container.sidebar-hidden {
-      margin-left: -300px;
+      margin-left: -270px;
     }
 
     #map {
@@ -203,6 +203,7 @@
       border-radius: 8px;
       margin: 1rem;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      min-height: 400px;
     }
 
     .legend {
