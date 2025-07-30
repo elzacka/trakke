@@ -75,6 +75,10 @@
       align-items: center;
       justify-content: center;
       margin-left: auto;
+      position: absolute;
+      right: 1rem;
+      top: 1.5rem;
+      z-index: 1001;
     }
 
     .sidebar-toggle:hover {
@@ -87,8 +91,10 @@
       transition: transform 0.3s ease;
     }
 
-    .sidebar-toggle.collapsed .material-symbols-outlined {
-      transform: rotate(180deg);
+    .sidebar.hidden .sidebar-toggle {
+      background: white;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 0 4px 4px 0;
     }
 
     .container {
@@ -105,10 +111,20 @@
       overflow-y: auto;
       transition: transform 0.3s ease;
       z-index: 1000;
+      position: relative;
     }
 
     .sidebar.hidden {
-      transform: translateX(-100%);
+      transform: translateX(-270px);
+    }
+
+    .sidebar.hidden .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sidebar-content {
+      transition: opacity 0.3s ease;
     }
 
     .filter-section {
@@ -285,16 +301,18 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     
     <div class="sidebar" id="sidebar">
-      <div class="filter-section">
-        <h3>
-          <div class="filter-section-header">
-            <span class="material-symbols-outlined">map</span>
-            Vis/skjul på kart
-          </div>
-          <button class="sidebar-toggle" id="sidebarToggle" title="Skjul/vis panel">
-            <span class="material-symbols-outlined">chevron_left</span>
-          </button>
-        </h3>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Skjul/vis panel">
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      
+      <div class="sidebar-content">
+        <div class="filter-section">
+          <h3>
+            <div class="filter-section-header">
+              <span class="material-symbols-outlined">map</span>
+              Se/ta bort på kart
+            </div>
+          </h3>
         <div class="filter-group">
           <div class="filter-item">
             <input type="checkbox" id="hiking" checked />
@@ -385,13 +403,11 @@
         sidebar.classList.remove('hidden');
         mapContainer.classList.remove('sidebar-hidden');
         sidebarOverlay.classList.remove('active');
-        sidebarToggle.classList.remove('collapsed');
         toggleIcon.textContent = 'chevron_left';
         sidebarToggle.title = 'Skjul panel';
       } else {
         sidebar.classList.add('hidden');
         mapContainer.classList.add('sidebar-hidden');
-        sidebarToggle.classList.add('collapsed');
         toggleIcon.textContent = 'chevron_right';
         sidebarToggle.title = 'Vis panel';
       }
