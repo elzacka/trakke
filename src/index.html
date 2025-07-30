@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tråkke - Bykle og Valle</title>
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Google Fonts: Exo 2 -->
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
   <style>
     body {
@@ -21,34 +22,44 @@
       line-height: 1.6;
     }
 
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 18px;
+      line-height: 1;
+    }
+
     .header {
       background: linear-gradient(135deg, #19461A, #486A47);
       color: white;
       padding: 1rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .title-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .title-wrapper h1 {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      margin: 0;
+      font-size: 1.8rem;
     }
 
-    .header svg {
+    .title-wrapper svg {
       height: 28px;
       width: 28px;
-      fill: #FFFFFF;
+      fill: #ffffff;
       flex-shrink: 0;
     }
 
-    .header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .header p {
-      margin: 0.5rem 0 0 0;
+    .tagline {
+      margin: 0.4rem 0 0 0;
       opacity: 0.9;
+      font-size: 1rem;
     }
 
     .container {
@@ -60,7 +71,7 @@
       width: 300px;
       background: white;
       padding: 1rem;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
     }
 
@@ -72,6 +83,9 @@
       margin: 0 0 0.5rem 0;
       color: #2c5530;
       font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
     }
 
     .filter-group {
@@ -110,14 +124,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      background-color: #ccc;
+      color: white;
     }
 
     #map {
       flex: 1;
       border-radius: 8px;
       margin: 1rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 
     .legend {
@@ -125,7 +140,7 @@
       padding: 1rem;
       border-radius: 8px;
       margin-top: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
     .legend h4 {
@@ -149,55 +164,69 @@
 </head>
 <body>
   <div class="header">
-    <h1>
-      <!-- Tilpasset SVG-ikon -->
-      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-        <path d="M280-80v-160H0l154-240H80l280-400 120 172 120-172 280 400h-74l154 240H680v160H520v-160h-80v160H280Zm389-240h145L659-560h67L600-740l-71 101 111 159h-74l103 160Zm-523 0h428L419-560h67L360-740 234-560h67L146-320Zm0 0h155-67 252-67 155-428Zm523 0H566h74-111 197-67 155-145Zm-149 80h160-160Zm201 0Z"/>
-      </svg>
-      Tråkke</h1>
-    <p>Oppdag Bykle og Valle med turskoa på</p>
+    <div class="title-wrapper">
+      <h1>
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+          <path d="M280-80v-160H0l154-240H80l280-400 120 172 120-172 280 400h-74l154 240H680v160H520v-160h-80v160H280Zm389-240h145L659-560h67L600-740l-71 101 111 159h-74l103 160Zm-523 0h428L419-560h67L360-740 234-560h67L146-320Zm0 0h155-67 252-67 155-428Zm523 0H566h74-111 197-67 155-145Zm-149 80h160-160Zm201 0Z"/>
+        </svg>
+        TRÅKKE
+      </h1>
+      <p class="tagline">Oppdag Bykle og Valle med turskoa på</p>
+    </div>
   </div>
 
   <div class="container">
     <div class="sidebar">
       <div class="filter-section">
-        <h3>🗺️ Filtrer innhold</h3>
+        <h3><span class="material-symbols-outlined">map</span> Filtrer innhold</h3>
         <div class="filter-group">
           <div class="filter-item">
-            <input type="checkbox" id="hiking" checked>
-            <div class="icon-preview" style="background-color: #8B4513; color: white;">🥾</div>
+            <input type="checkbox" id="hiking" checked />
+            <div class="icon-preview" style="background-color: #8B4513;">
+              <span class="material-symbols-outlined">hiking</span>
+            </div>
             <label for="hiking">Vandreruter</label>
           </div>
           <div class="filter-item">
-            <input type="checkbox" id="swimming" checked>
-            <div class="icon-preview" style="background-color: #4169E1; color: white;">🏊</div>
+            <input type="checkbox" id="swimming" checked />
+            <div class="icon-preview" style="background-color: #4169E1;">
+              <span class="material-symbols-outlined">pool</span>
+            </div>
             <label for="swimming">Badesteder</label>
           </div>
           <div class="filter-item">
-            <input type="checkbox" id="camping" checked>
-            <div class="icon-preview" style="background-color: #228B22; color: white;">⛺</div>
-            <label for="camping">Camping/overnatting</label>
+            <input type="checkbox" id="camping" checked />
+            <div class="icon-preview" style="background-color: #228B22;">
+              <span class="material-symbols-outlined">camping</span>
+            </div>
+            <label for="camping">Camping</label>
           </div>
           <div class="filter-item">
-            <input type="checkbox" id="waterfalls" checked>
-            <div class="icon-preview" style="background-color: #20B2AA; color: white;">💧</div>
+            <input type="checkbox" id="waterfalls" checked />
+            <div class="icon-preview" style="background-color: #20B2AA;">
+              <span class="material-symbols-outlined">water_drop</span>
+            </div>
             <label for="waterfalls">Fosser</label>
           </div>
           <div class="filter-item">
-            <input type="checkbox" id="viewpoints" checked>
-            <div class="icon-preview" style="background-color: #FF6347; color: white;">🔭</div>
+            <input type="checkbox" id="viewpoints" checked />
+            <div class="icon-preview" style="background-color: #FF6347;">
+              <span class="material-symbols-outlined">landscape</span>
+            </div>
             <label for="viewpoints">Utsiktspunkter</label>
           </div>
           <div class="filter-item">
-            <input type="checkbox" id="history" checked>
-            <div class="icon-preview" style="background-color: #8B4B8B; color: white;">🏛️</div>
+            <input type="checkbox" id="history" checked />
+            <div class="icon-preview" style="background-color: #8B4B8B;">
+              <span class="material-symbols-outlined">museum</span>
+            </div>
             <label for="history">Historiske steder</label>
           </div>
         </div>
       </div>
 
       <div class="legend">
-        <h4>ℹ️ Informasjon</h4>
+        <h4><span class="material-symbols-outlined">info</span> Informasjon</h4>
         <p>Klikk på markørene for mer informasjon om hvert sted. Du kan zoome og dra kartet for å utforske området.</p>
       </div>
 
@@ -215,10 +244,46 @@
 
   <script>
     const map = L.map('map').setView([59.4, 7.4], 10);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
-      maxZoom: 18
+      maxZoom: 18,
     }).addTo(map);
+
+    const iconConfig = {
+      hiking: { color: '#8B4513', icon: 'hiking' },
+      swimming: { color: '#4169E1', icon: 'pool' },
+      camping: { color: '#228B22', icon: 'camping' },
+      waterfalls: { color: '#20B2AA', icon: 'water_drop' },
+      viewpoints: { color: '#FF6347', icon: 'landscape' },
+      history: { color: '#8B4B8B', icon: 'museum' },
+    };
+
+    function createCustomIcon(type) {
+      const config = iconConfig[type];
+      return L.divIcon({
+        html: `
+          <div style="
+            background-color: ${config.color};
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+          ">
+            <span class='material-symbols-outlined'>${config.icon}</span>
+          </div>
+        `,
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+    }
 
     const poiData = [
       {
@@ -268,55 +333,8 @@
         lng: 7.7890,
         description: 'Middelalderkirke fra 1100-tallet, en av få bevarte stavkirker.',
         period: 'Middelalder'
-      },
-      {
-        type: 'hiking',
-        name: 'Steindalstind',
-        lat: 59.2345,
-        lng: 7.5678,
-        description: 'Populær dagstur med flott utsikt over Byglandsfjorden.',
-        difficulty: 'Middels'
-      },
-      {
-        type: 'swimming',
-        name: 'Åraksbøvatnet',
-        lat: 59.4567,
-        lng: 7.1234,
-        description: 'Idyllisk fjelltjern perfekt for et forfriskende bad.',
-        temperature: 'Kaldt, 12-16°C om sommeren'
       }
     ];
-
-    const iconConfig = {
-      hiking: { color: '#8B4513', icon: '🥾' },
-      swimming: { color: '#4169E1', icon: '🏊' },
-      camping: { color: '#228B22', icon: '⛺' },
-      waterfalls: { color: '#20B2AA', icon: '💧' },
-      viewpoints: { color: '#FF6347', icon: '🔭' },
-      history: { color: '#8B4B8B', icon: '🏛️' }
-    };
-
-    function createCustomIcon(type) {
-      const config = iconConfig[type];
-      return L.divIcon({
-        html: `<div style="
-          background-color: ${config.color};
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 14px;
-          border: 2px solid white;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        ">${config.icon}</div>`,
-        className: 'custom-div-icon',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
-    }
 
     const layerGroups = {};
     Object.keys(iconConfig).forEach(type => {
@@ -326,25 +344,24 @@
     function addMarkers() {
       poiData.forEach(poi => {
         const marker = L.marker([poi.lat, poi.lng], {
-          icon: createCustomIcon(poi.type)
+          icon: createCustomIcon(poi.type),
         });
 
-        let popupContent = `
+        const config = iconConfig[poi.type];
+        const popupContent = `
           <div style="min-width: 200px;">
-            <h3 style="margin: 0 0 10px 0; color: ${iconConfig[poi.type].color};">
-              ${iconConfig[poi.type].icon} ${poi.name}
+            <h3 style="margin: 0 0 10px 0; color: ${config.color};">
+              <span class="material-symbols-outlined" style="vertical-align: middle;">${config.icon}</span> ${poi.name}
             </h3>
             <p style="margin: 5px 0;">${poi.description}</p>
+            ${poi.difficulty ? `<p><strong>Vanskelighetsgrad:</strong> ${poi.difficulty}</p>` : ''}
+            ${poi.facilities ? `<p><strong>Fasiliteter:</strong> ${poi.facilities}</p>` : ''}
+            ${poi.services ? `<p><strong>Tjenester:</strong> ${poi.services}</p>` : ''}
+            ${poi.season ? `<p><strong>Sesong:</strong> ${poi.season}</p>` : ''}
+            ${poi.elevation ? `<p><strong>Høyde:</strong> ${poi.elevation}</p>` : ''}
+            ${poi.period ? `<p><strong>Periode:</strong> ${poi.period}</p>` : ''}
+          </div>
         `;
-        if (poi.difficulty) popupContent += `<p><strong>Vanskelighetsgrad:</strong> ${poi.difficulty}</p>`;
-        if (poi.facilities) popupContent += `<p><strong>Fasiliteter:</strong> ${poi.facilities}</p>`;
-        if (poi.services) popupContent += `<p><strong>Tjenester:</strong> ${poi.services}</p>`;
-        if (poi.season) popupContent += `<p><strong>Sesong:</strong> ${poi.season}</p>`;
-        if (poi.elevation) popupContent += `<p><strong>Høyde:</strong> ${poi.elevation}</p>`;
-        if (poi.period) popupContent += `<p><strong>Periode:</strong> ${poi.period}</p>`;
-        if (poi.temperature) popupContent += `<p><strong>Temperatur:</strong> ${poi.temperature}</p>`;
-
-        popupContent += `</div>`;
 
         marker.bindPopup(popupContent);
         layerGroups[poi.type].addLayer(marker);
@@ -353,9 +370,9 @@
 
     function updateStats() {
       let visibleCount = 0;
-      Object.keys(layerGroups).forEach(type => {
-        if (map.hasLayer(layerGroups[type])) {
-          visibleCount += Object.keys(layerGroups[type]._layers).length;
+      Object.values(layerGroups).forEach(group => {
+        if (map.hasLayer(group)) {
+          visibleCount += Object.keys(group._layers).length;
         }
       });
       document.getElementById('visible-count').textContent = visibleCount;
@@ -365,8 +382,8 @@
     function setupFilters() {
       Object.keys(iconConfig).forEach(type => {
         const checkbox = document.getElementById(type);
-        checkbox.addEventListener('change', function () {
-          if (this.checked) {
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
             map.addLayer(layerGroups[type]);
           } else {
             map.removeLayer(layerGroups[type]);
@@ -379,12 +396,6 @@
     addMarkers();
     setupFilters();
     updateStats();
-
-    map.on('click', function (e) {
-      const lat = e.latlng.lat.toFixed(6);
-      const lng = e.latlng.lng.toFixed(6);
-      console.log(`Koordinater: ${lat}, ${lng}`);
-    });
   </script>
 </body>
 </html>
