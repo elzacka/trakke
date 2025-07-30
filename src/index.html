@@ -33,7 +33,6 @@
       color: white;
       padding: 1rem;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      position: relative;
     }
 
     .title-wrapper {
@@ -63,44 +62,9 @@
       font-size: 1rem;
     }
 
-    .sidebar-toggle {
-      background: none;
-      border: none;
-      color: #2c5530;
-      cursor: pointer;
-      padding: 0.3rem;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: auto;
-      position: absolute;
-      right: 1rem;
-      top: 1.5rem;
-      z-index: 1001;
-    }
-
-    .sidebar-toggle:hover {
-      background: rgba(44, 85, 48, 0.1);
-      color: #1a3a1c;
-    }
-
-    .sidebar-toggle .material-symbols-outlined {
-      font-size: 18px;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar.hidden .sidebar-toggle {
-      background: white;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      border-radius: 0 4px 4px 0;
-    }
-
     .container {
       display: flex;
       height: calc(100vh - 100px);
-      position: relative;
     }
 
     .sidebar {
@@ -109,22 +73,47 @@
       padding: 1rem;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
-      transition: transform 0.3s ease;
-      z-index: 1000;
       position: relative;
+      transition: all 0.3s ease;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-270px);
+    .sidebar.collapsed {
+      width: 50px;
+      padding: 1rem 0.5rem;
+    }
+
+    .sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
     }
 
     .sidebar-content {
       transition: opacity 0.3s ease;
     }
 
-    .sidebar.hidden .sidebar-content {
-      opacity: 0;
-      pointer-events: none;
+    .sidebar-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      color: #2c5530;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(44, 85, 48, 0.1);
+    }
+
+    .sidebar-toggle .material-symbols-outlined {
+      font-size: 20px;
     }
 
     .filter-section {
@@ -135,13 +124,6 @@
       margin: 0 0 0.5rem 0;
       color: #2c5530;
       font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      justify-content: space-between;
-    }
-
-    .filter-section-header {
       display: flex;
       align-items: center;
       gap: 0.3rem;
@@ -187,19 +169,8 @@
       color: white;
     }
 
-    .map-container {
-      flex: 1;
-      position: relative;
-      transition: margin-left 0.3s ease;
-    }
-
-    .map-container.sidebar-hidden {
-      margin-left: -270px;
-    }
-
     #map {
-      width: 100%;
-      height: 100%;
+      flex: 1;
       border-radius: 8px;
       margin: 1rem;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -232,55 +203,18 @@
       color: #2c5530;
     }
 
-    /* Mobile responsiveness */
+    /* Mobile adjustments */
     @media (max-width: 768px) {
       .sidebar {
         width: 280px;
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        z-index: 1001;
       }
-
-      .map-container {
-        margin-left: 0;
-      }
-
-      .map-container.sidebar-hidden {
-        margin-left: 0;
+      
+      .sidebar.collapsed {
+        width: 40px;
       }
 
       #map {
         margin: 0.5rem;
-      }
-
-      .sidebar-toggle {
-        display: flex;
-      }
-    }
-
-    @media (min-width: 769px) {
-      .sidebar-toggle {
-        display: flex;
-      }
-    }
-
-    /* Overlay for mobile when sidebar is open */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar-overlay.active {
-        display: block;
       }
     }
   </style>
@@ -299,305 +233,280 @@
   </div>
 
   <div class="container">
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    
     <div class="sidebar" id="sidebar">
-      <button class="sidebar-toggle" id="sidebarToggle" title="Skjul/vis panel">
+      <button class="sidebar-toggle" id="sidebarToggle" title="Skjul panel">
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
       
       <div class="sidebar-content">
         <div class="filter-section">
-          <h3>
-            <div class="filter-section-header">
-              <span class="material-symbols-outlined">map</span>
-              Se/ta bort på kart
+          <h3><span class="material-symbols-outlined">map</span> Se/ta bort på kart</h3>
+          <div class="filter-group">
+            <div class="filter-item">
+              <input type="checkbox" id="hiking" checked />
+              <div class="icon-preview" style="background-color: #8B4513;">
+                <span class="material-symbols-outlined">hiking</span>
+              </div>
+              <label for="hiking">Vandre</label>
             </div>
-          </h3>
-        <div class="filter-group">
-          <div class="filter-item">
-            <input type="checkbox" id="hiking" checked />
-            <div class="icon-preview" style="background-color: #8B4513;">
-              <span class="material-symbols-outlined">hiking</span>
+            <div class="filter-item">
+              <input type="checkbox" id="swimming" checked />
+              <div class="icon-preview" style="background-color: #4169E1;">
+                <span class="material-symbols-outlined">pool</span>
+              </div>
+              <label for="swimming">Bade</label>
             </div>
-            <label for="hiking">Vandre</label>
-          </div>
-          <div class="filter-item">
-            <input type="checkbox" id="swimming" checked />
-            <div class="icon-preview" style="background-color: #4169E1;">
-              <span class="material-symbols-outlined">pool</span>
+            <div class="filter-item">
+              <input type="checkbox" id="camping" checked />
+              <div class="icon-preview" style="background-color: #228B22;">
+                <span class="material-symbols-outlined">camping</span>
+              </div>
+              <label for="camping">Sove</label>
             </div>
-            <label for="swimming">Bade</label>
-          </div>
-          <div class="filter-item">
-            <input type="checkbox" id="camping" checked />
-            <div class="icon-preview" style="background-color: #228B22;">
-              <span class="material-symbols-outlined">camping</span>
+            <div class="filter-item">
+              <input type="checkbox" id="waterfalls" checked />
+              <div class="icon-preview" style="background-color: #20B2AA;">
+                <span class="material-symbols-outlined">water_drop</span>
+              </div>
+              <label for="waterfalls">Foss</label>
             </div>
-            <label for="camping">Sove</label>
-          </div>
-          <div class="filter-item">
-            <input type="checkbox" id="waterfalls" checked />
-            <div class="icon-preview" style="background-color: #20B2AA;">
-              <span class="material-symbols-outlined">water_drop</span>
+            <div class="filter-item">
+              <input type="checkbox" id="viewpoints" checked />
+              <div class="icon-preview" style="background-color: #FF6347;">
+                <span class="material-symbols-outlined">landscape</span>
+              </div>
+              <label for="viewpoints">Utsikt</label>
             </div>
-            <label for="waterfalls">Foss</label>
-          </div>
-          <div class="filter-item">
-            <input type="checkbox" id="viewpoints" checked />
-            <div class="icon-preview" style="background-color: #FF6347;">
-              <span class="material-symbols-outlined">landscape</span>
+            <div class="filter-item">
+              <input type="checkbox" id="history" checked />
+              <div class="icon-preview" style="background-color: #8B4B8B;">
+                <span class="material-symbols-outlined">museum</span>
+              </div>
+              <label for="history">Historisk</label>
             </div>
-            <label for="viewpoints">Utsikt</label>
-          </div>
-          <div class="filter-item">
-            <input type="checkbox" id="history" checked />
-            <div class="icon-preview" style="background-color: #8B4B8B;">
-              <span class="material-symbols-outlined">museum</span>
-            </div>
-            <label for="history">Historisk</label>
           </div>
         </div>
-      </div>
 
-      <div class="legend">
-        <h4><span class="material-symbols-outlined">info</span> Veiledning</h4>
-        <p>Klikk på ikonene i kartet for mer info om hvert punkt. Du kan zoome og dra kartet for å utforske området.</p>
-      </div>
+        <div class="legend">
+          <h4><span class="material-symbols-outlined">info</span> Veiledning</h4>
+          <p>Klikk på ikonene i kartet for mer info om hvert punkt. Du kan zoome og dra kartet for å utforske området.</p>
+        </div>
 
-      <div class="stats">
-        <p><strong>Synlige punkter:</strong> <span id="visible-count">0</span></p>
-        <p><strong>Totalt i området:</strong> <span id="total-count">0</span></p>
+        <div class="stats">
+          <p><strong>Synlige punkter:</strong> <span id="visible-count">0</span></p>
+          <p><strong>Totalt i området:</strong> <span id="total-count">0</span></p>
+        </div>
       </div>
     </div>
 
-    <div class="map-container" id="mapContainer">
-      <div id="map"></div>
-    </div>
+    <div id="map"></div>
   </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Initialize map
-    const map = L.map('map').setView([59.4, 7.4], 10);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18,
-    }).addTo(map);
-
-    // Sidebar toggle functionality
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebar = document.getElementById('sidebar');
-    const mapContainer = document.getElementById('mapContainer');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const toggleIcon = sidebarToggle.querySelector('.material-symbols-outlined');
-
-    let sidebarVisible = true;
-
-    function toggleSidebar() {
-      sidebarVisible = !sidebarVisible;
+    // Wait for DOM and Leaflet to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing map...');
       
-      if (sidebarVisible) {
-        sidebar.classList.remove('hidden');
-        mapContainer.classList.remove('sidebar-hidden');
-        sidebarOverlay.classList.remove('active');
-        toggleIcon.textContent = 'chevron_left';
-        sidebarToggle.title = 'Skjul panel';
-      } else {
-        sidebar.classList.add('hidden');
-        mapContainer.classList.add('sidebar-hidden');
-        toggleIcon.textContent = 'chevron_right';
-        sidebarToggle.title = 'Vis panel';
-      }
+      // Initialize map
+      const map = L.map('map').setView([59.4, 7.4], 10);
+      console.log('Map created');
 
-      // Resize map after animation
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 300);
-    }
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18,
+      }).addTo(map);
+      console.log('Tile layer added');
 
-    // Event listeners for sidebar toggle
-    sidebarToggle.addEventListener('click', toggleSidebar);
-    sidebarOverlay.addEventListener('click', () => {
-      if (window.innerWidth <= 768 && sidebarVisible) {
-        toggleSidebar();
-      }
-    });
+      // Sidebar toggle functionality
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.getElementById('sidebar');
+      const toggleIcon = sidebarToggle.querySelector('.material-symbols-outlined');
 
-    // Handle responsive behavior
-    function handleResize() {
-      if (window.innerWidth <= 768) {
-        // Mobile: show overlay when sidebar is visible
+      let sidebarVisible = true;
+
+      function toggleSidebar() {
+        sidebarVisible = !sidebarVisible;
+        
         if (sidebarVisible) {
-          sidebarOverlay.classList.add('active');
+          sidebar.classList.remove('collapsed');
+          toggleIcon.textContent = 'chevron_left';
+          sidebarToggle.title = 'Skjul panel';
+        } else {
+          sidebar.classList.add('collapsed');
+          toggleIcon.textContent = 'chevron_right';
+          sidebarToggle.title = 'Vis panel';
         }
-      } else {
-        // Desktop: remove overlay
-        sidebarOverlay.classList.remove('active');
+
+        // Resize map after animation
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 300);
       }
-      
-      // Resize map
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 100);
-    }
 
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Initial call
+      // Event listener for sidebar toggle
+      sidebarToggle.addEventListener('click', toggleSidebar);
 
-    // Icon configuration
-    const iconConfig = {
-      hiking: { color: '#8B4513', icon: 'hiking' },
-      swimming: { color: '#4169E1', icon: 'pool' },
-      camping: { color: '#228B22', icon: 'camping' },
-      waterfalls: { color: '#20B2AA', icon: 'water_drop' },
-      viewpoints: { color: '#FF6347', icon: 'landscape' },
-      history: { color: '#8B4B8B', icon: 'museum' },
-    };
+      // Icon configuration
+      const iconConfig = {
+        hiking: { color: '#8B4513', icon: 'hiking' },
+        swimming: { color: '#4169E1', icon: 'pool' },
+        camping: { color: '#228B22', icon: 'camping' },
+        waterfalls: { color: '#20B2AA', icon: 'water_drop' },
+        viewpoints: { color: '#FF6347', icon: 'landscape' },
+        history: { color: '#8B4B8B', icon: 'museum' },
+      };
 
-    function createCustomIcon(type) {
-      const config = iconConfig[type];
-      return L.divIcon({
-        html: `
-          <div style="
-            background-color: ${config.color};
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 18px;
-            border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-          ">
-            <span class='material-symbols-outlined'>${config.icon}</span>
-          </div>
-        `,
-        className: 'custom-div-icon',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-      });
-    }
-
-    // POI data
-    const poiData = [
-      {
-        type: 'hiking',
-        name: 'Reinevasstind (1404 moh)',
-        lat: 59.4892,
-        lng: 7.1845,
-        description: 'Spektakulær tur til høyeste punkt i Valle. Ca. 6 timer tur/retur.',
-        difficulty: 'Krevende'
-      },
-      {
-        type: 'swimming',
-        name: 'Byglandsfjord badeplass',
-        lat: 59.1234,
-        lng: 7.8123,
-        description: 'Fin badeplass ved fjorden med gressareal og brygger.',
-        facilities: 'Toalett, parkering'
-      },
-      {
-        type: 'camping',
-        name: 'Hovden camping',
-        lat: 59.5456,
-        lng: 7.3456,
-        description: 'Familievennlig camping ved foten av Hovdenfjell.',
-        services: 'Hytte, teltplass, strøm'
-      },
-      {
-        type: 'waterfalls',
-        name: 'Rjukandefossen',
-        lat: 59.3789,
-        lng: 7.2789,
-        description: '182 meter høy foss - en av Norges høyeste.',
-        season: 'Best fra mai til oktober'
-      },
-      {
-        type: 'viewpoints',
-        name: 'Hovdenfjell utsikt',
-        lat: 59.5123,
-        lng: 7.3234,
-        description: 'Fantastisk utsikt over Setesdal og mot kysten.',
-        elevation: '1200 moh'
-      },
-      {
-        type: 'history',
-        name: 'Rygnestad stavkirke',
-        lat: 59.1567,
-        lng: 7.7890,
-        description: 'Middelalderkirke fra 1100-tallet, en av få bevarte stavkirker.',
-        period: 'Middelalder'
-      }
-    ];
-
-    // Layer groups
-    const layerGroups = {};
-    Object.keys(iconConfig).forEach(type => {
-      layerGroups[type] = L.layerGroup().addTo(map);
-    });
-
-    function addMarkers() {
-      poiData.forEach(poi => {
-        const marker = L.marker([poi.lat, poi.lng], {
-          icon: createCustomIcon(poi.type),
+      function createCustomIcon(type) {
+        const config = iconConfig[type];
+        return L.divIcon({
+          html: `
+            <div style="
+              background-color: ${config.color};
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 18px;
+              border: 2px solid white;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            ">
+              <span class='material-symbols-outlined'>${config.icon}</span>
+            </div>
+          `,
+          className: 'custom-div-icon',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
         });
+      }
 
-        const config = iconConfig[poi.type];
-        const popupContent = `
-          <div style="min-width: 200px;">
-            <h3 style="margin: 0 0 10px 0; color: ${config.color};">
-              <span class="material-symbols-outlined" style="vertical-align: middle;">${config.icon}</span> ${poi.name}
-            </h3>
-            <p style="margin: 5px 0;">${poi.description}</p>
-            ${poi.difficulty ? `<p><strong>Vanskelighetsgrad:</strong> ${poi.difficulty}</p>` : ''}
-            ${poi.facilities ? `<p><strong>Fasiliteter:</strong> ${poi.facilities}</p>` : ''}
-            ${poi.services ? `<p><strong>Tjenester:</strong> ${poi.services}</p>` : ''}
-            ${poi.season ? `<p><strong>Sesong:</strong> ${poi.season}</p>` : ''}
-            ${poi.elevation ? `<p><strong>Høyde:</strong> ${poi.elevation}</p>` : ''}
-            ${poi.period ? `<p><strong>Periode:</strong> ${poi.period}</p>` : ''}
-          </div>
-        `;
-
-        marker.bindPopup(popupContent);
-        layerGroups[poi.type].addLayer(marker);
-      });
-    }
-
-    function updateStats() {
-      let visibleCount = 0;
-      Object.values(layerGroups).forEach(group => {
-        if (map.hasLayer(group)) {
-          visibleCount += Object.keys(group._layers).length;
+      // POI data
+      const poiData = [
+        {
+          type: 'hiking',
+          name: 'Reinevasstind (1404 moh)',
+          lat: 59.4892,
+          lng: 7.1845,
+          description: 'Spektakulær tur til høyeste punkt i Valle. Ca. 6 timer tur/retur.',
+          difficulty: 'Krevende'
+        },
+        {
+          type: 'swimming',
+          name: 'Byglandsfjord badeplass',
+          lat: 59.1234,
+          lng: 7.8123,
+          description: 'Fin badeplass ved fjorden med gressareal og brygger.',
+          facilities: 'Toalett, parkering'
+        },
+        {
+          type: 'camping',
+          name: 'Hovden camping',
+          lat: 59.5456,
+          lng: 7.3456,
+          description: 'Familievennlig camping ved foten av Hovdenfjell.',
+          services: 'Hytte, teltplass, strøm'
+        },
+        {
+          type: 'waterfalls',
+          name: 'Rjukandefossen',
+          lat: 59.3789,
+          lng: 7.2789,
+          description: '182 meter høy foss - en av Norges høyeste.',
+          season: 'Best fra mai til oktober'
+        },
+        {
+          type: 'viewpoints',
+          name: 'Hovdenfjell utsikt',
+          lat: 59.5123,
+          lng: 7.3234,
+          description: 'Fantastisk utsikt over Setesdal og mot kysten.',
+          elevation: '1200 moh'
+        },
+        {
+          type: 'history',
+          name: 'Rygnestad stavkirke',
+          lat: 59.1567,
+          lng: 7.7890,
+          description: 'Middelalderkirke fra 1100-tallet, en av få bevarte stavkirker.',
+          period: 'Middelalder'
         }
-      });
-      document.getElementById('visible-count').textContent = visibleCount;
-      document.getElementById('total-count').textContent = poiData.length;
-    }
+      ];
 
-    function setupFilters() {
+      // Layer groups
+      const layerGroups = {};
       Object.keys(iconConfig).forEach(type => {
-        const checkbox = document.getElementById(type);
-        checkbox.addEventListener('change', () => {
-          if (checkbox.checked) {
-            map.addLayer(layerGroups[type]);
-          } else {
-            map.removeLayer(layerGroups[type]);
-          }
-          updateStats();
-        });
+        layerGroups[type] = L.layerGroup().addTo(map);
       });
-    }
 
-    // Initialize
-    addMarkers();
-    setupFilters();
-    updateStats();
+      function addMarkers() {
+        console.log('Adding markers...');
+        poiData.forEach(poi => {
+          const marker = L.marker([poi.lat, poi.lng], {
+            icon: createCustomIcon(poi.type),
+          });
+
+          const config = iconConfig[poi.type];
+          const popupContent = `
+            <div style="min-width: 200px;">
+              <h3 style="margin: 0 0 10px 0; color: ${config.color};">
+                <span class="material-symbols-outlined" style="vertical-align: middle;">${config.icon}</span> ${poi.name}
+              </h3>
+              <p style="margin: 5px 0;">${poi.description}</p>
+              ${poi.difficulty ? `<p><strong>Vanskelighetsgrad:</strong> ${poi.difficulty}</p>` : ''}
+              ${poi.facilities ? `<p><strong>Fasiliteter:</strong> ${poi.facilities}</p>` : ''}
+              ${poi.services ? `<p><strong>Tjenester:</strong> ${poi.services}</p>` : ''}
+              ${poi.season ? `<p><strong>Sesong:</strong> ${poi.season}</p>` : ''}
+              ${poi.elevation ? `<p><strong>Høyde:</strong> ${poi.elevation}</p>` : ''}
+              ${poi.period ? `<p><strong>Periode:</strong> ${poi.period}</p>` : ''}
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+          layerGroups[poi.type].addLayer(marker);
+        });
+        console.log('Markers added');
+      }
+
+      function updateStats() {
+        let visibleCount = 0;
+        Object.values(layerGroups).forEach(group => {
+          if (map.hasLayer(group)) {
+            visibleCount += Object.keys(group._layers).length;
+          }
+        });
+        document.getElementById('visible-count').textContent = visibleCount;
+        document.getElementById('total-count').textContent = poiData.length;
+      }
+
+      function setupFilters() {
+        console.log('Setting up filters...');
+        Object.keys(iconConfig).forEach(type => {
+          const checkbox = document.getElementById(type);
+          if (checkbox) {
+            checkbox.addEventListener('change', () => {
+              if (checkbox.checked) {
+                map.addLayer(layerGroups[type]);
+              } else {
+                map.removeLayer(layerGroups[type]);
+              }
+              updateStats();
+            });
+          }
+        });
+      }
+
+      // Initialize everything
+      addMarkers();
+      setupFilters();
+      updateStats();
+      
+      console.log('Map initialization complete');
+    });
   </script>
 </body>
 </html>
