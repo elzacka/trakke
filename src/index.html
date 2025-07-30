@@ -33,6 +33,7 @@
       color: white;
       padding: 1rem;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
 
     .title-wrapper {
@@ -62,9 +63,37 @@
       font-size: 1rem;
     }
 
+    .sidebar-toggle {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar-toggle .material-symbols-outlined {
+      font-size: 20px;
+    }
+
     .container {
       display: flex;
       height: calc(100vh - 100px);
+      position: relative;
     }
 
     .sidebar {
@@ -73,6 +102,12 @@
       padding: 1rem;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
     }
 
     .filter-section {
@@ -128,8 +163,19 @@
       color: white;
     }
 
-    #map {
+    .map-container {
       flex: 1;
+      position: relative;
+      transition: margin-left 0.3s ease;
+    }
+
+    .map-container.sidebar-hidden {
+      margin-left: -300px;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
       border-radius: 8px;
       margin: 1rem;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -160,6 +206,58 @@
       font-size: 0.9rem;
       color: #2c5530;
     }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 280px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 1001;
+      }
+
+      .map-container {
+        margin-left: 0;
+      }
+
+      .map-container.sidebar-hidden {
+        margin-left: 0;
+      }
+
+      #map {
+        margin: 0.5rem;
+      }
+
+      .sidebar-toggle {
+        display: flex;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .sidebar-toggle {
+        display: flex;
+      }
+    }
+
+    /* Overlay for mobile when sidebar is open */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
@@ -173,10 +271,15 @@
       </h1>
       <p class="tagline">Oppdag Bykle og Valle med turskoa på</p>
     </div>
+    <button class="sidebar-toggle" id="sidebarToggle" title="Vis/skjul meny">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
   </div>
 
   <div class="container">
-    <div class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="sidebar" id="sidebar">
       <div class="filter-section">
         <h3><span class="material-symbols-outlined">map</span> Se/ta bort på kart</h3>
         <div class="filter-group">
@@ -236,13 +339,16 @@
       </div>
     </div>
 
-    <div id="map"></div>
+    <div class="map-container" id="mapContainer">
+      <div id="map"></div>
+    </div>
   </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
+    // Initialize map
     const map = L.map('map').setView([59.4, 7.4], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -250,6 +356,67 @@
       maxZoom: 18,
     }).addTo(map);
 
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mapContainer = document.getElementById('mapContainer');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const toggleIcon = sidebarToggle.querySelector('.material-symbols-outlined');
+
+    let sidebarVisible = true;
+
+    function toggleSidebar() {
+      sidebarVisible = !sidebarVisible;
+      
+      if (sidebarVisible) {
+        sidebar.classList.remove('hidden');
+        mapContainer.classList.remove('sidebar-hidden');
+        sidebarOverlay.classList.remove('active');
+        toggleIcon.textContent = 'menu';
+        sidebarToggle.title = 'Skjul meny';
+      } else {
+        sidebar.classList.add('hidden');
+        mapContainer.classList.add('sidebar-hidden');
+        toggleIcon.textContent = 'menu_open';
+        sidebarToggle.title = 'Vis meny';
+      }
+
+      // Resize map after animation
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 300);
+    }
+
+    // Event listeners for sidebar toggle
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', () => {
+      if (window.innerWidth <= 768 && sidebarVisible) {
+        toggleSidebar();
+      }
+    });
+
+    // Handle responsive behavior
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        // Mobile: show overlay when sidebar is visible
+        if (sidebarVisible) {
+          sidebarOverlay.classList.add('active');
+        }
+      } else {
+        // Desktop: remove overlay
+        sidebarOverlay.classList.remove('active');
+      }
+      
+      // Resize map
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 100);
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial call
+
+    // Icon configuration
     const iconConfig = {
       hiking: { color: '#8B4513', icon: 'hiking' },
       swimming: { color: '#4169E1', icon: 'pool' },
@@ -285,6 +452,7 @@
       });
     }
 
+    // POI data
     const poiData = [
       {
         type: 'hiking',
@@ -336,6 +504,7 @@
       }
     ];
 
+    // Layer groups
     const layerGroups = {};
     Object.keys(iconConfig).forEach(type => {
       layerGroups[type] = L.layerGroup().addTo(map);
@@ -393,6 +562,7 @@
       });
     }
 
+    // Initialize
     addMarkers();
     setupFilters();
     updateStats();
